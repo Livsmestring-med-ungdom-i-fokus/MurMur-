@@ -13,9 +13,10 @@ def run_spectre_mode(user_text: str, listener_output: dict[str, Any], state: Run
     primary_obstacle = obstacles[0]
 
     spectre_phases = [
-        "Scan: finn varme leads i en snever nisje",
-        "Prioriter: ranger leads etter kjøpssignal",
-        "Trigger: send målrettet outreach med ett klart tilbud",
+        "Scan: identifiser kjøps- og salgsdata per modul",
+        "Prioriter: ranger kontoer etter kjøpssignal og kontrakts-fit",
+        "Trigger: kjør målrettet outreach med eksklusivt tilbud",
+        "Secure: verifiser NDA-krav, kontraktsflyt og tilgangsnivå",
         "Refiner: logg svar, lær, og juster automatisk",
         "Execute: repeter daglig med KPI-kontroll",
     ]
@@ -23,8 +24,10 @@ def run_spectre_mode(user_text: str, listener_output: dict[str, Any], state: Run
     next_actions = [
         f"Velg én nisje: {state.niche}",
         f"Definer ett resultatløfte for målet '{primary_goal}'",
+        "Bygg to flyter: digitalt innkjøp (buy-side) og digitalt salg (sell-side)",
+        "Aktiver NDA-gating før deling av sensitiv dokumentasjon",
         f"Lag en anti-friksjon-rutine for hinderet '{primary_obstacle}'",
-        "Sett ukentlig måltall: leads, svarrate, avslutninger",
+        "Sett ukentlig måltall: leads, svarrate, avslutninger, signerte NDA",
     ]
 
     return {
