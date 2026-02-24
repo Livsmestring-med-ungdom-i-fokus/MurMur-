@@ -9,14 +9,18 @@ GOAL_RULES: tuple[tuple[tuple[str, ...], str], ...] = (
     (("inntekt", "side innkomst", "sideinntekt"), "Bygge stabil sideinntekt"),
     (("automatis", "automatisere", "automatisering"), "Automatisere salgsprosessen"),
     (("logg", "kartlegge", "kartlegging"), "Kartlegge og loggføre forbedringer"),
+    (("kjøp", "innkjøp", "procurement"), "Optimalisere digital innkjøpsflyt"),
+    (("salg", "salgsflyt", "avtaler"), "Optimalisere digital salgsflyt"),
+    (("kontrakt", "nda", "eksklusiv"), "Sikre eksklusive avtaler med NDA"),
 )
 
 OBSTACLE_RULES: tuple[tuple[tuple[str, ...], str], ...] = (
     (("tid", "travelt", "mangler tid"), "Begrenset tid"),
     (("usikker", "vet ikke", "uklart"), "Utydelig første steg"),
+    (("compliance", "juridisk", "konfidensialitet"), "Krav til kontrakt og compliance"),
 )
 
-SIGNALS = ["realtime-learning", "modular-system", "automation"]
+SIGNALS = ["realtime-learning", "modular-system", "automation", "nda-contracts", "b2b-deals"]
 
 
 def _sanitize_text(value: str) -> str:
