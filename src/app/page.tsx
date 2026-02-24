@@ -92,6 +92,28 @@ export default function HomePage() {
       </section>
 
       <section className="card">
+        <p className="text-xs uppercase tracking-[0.24em] text-accent">Nytt pilotkonsept</p>
+        <h2 className="mt-3 text-2xl font-semibold">Raspberry Pi-oppsett for skjermer på arbeidsplassen</h2>
+        <p className="mt-3 max-w-4xl text-sm text-ink">
+          Vi setter opp Raspberry Pi med eksisterende PC-skjermer for å vise målrettet innhold innen markedsføring,
+          motivasjon og selvlæring. Løsningen er laget for å spare tid, redusere friksjon i hverdagen og forebygge store
+          feil som i verste fall kan koste millioner.
+        </p>
+        <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-ink">
+          <li>Første bedrift får gratis pilotplan mot signert, streng NDA.</li>
+          <li>Strukturert oppfølging og feedback for kontinuerlig optimalisering.</li>
+          <li>Kan skaleres fra enkeltpersoner og team til store enterprise-miljøer.</li>
+          <li>Konkurransedyktige priser etter pilotfasen.</li>
+        </ul>
+        <div className="mt-6">
+          <Link href="/contact" className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-night hover:opacity-90">
+            Søk om gratis pilot
+          </Link>
+        </div>
+      </section>
+
+
+      <section className="card">
         <h2 className="text-2xl font-semibold">Case studies kommer snart</h2>
         <p className="mt-3 max-w-3xl text-sm text-ink">
           Vi publiserer konkrete resultathistorier når klienter har gitt samtykke. Inntil da deler vi metode, tempo og
