@@ -113,6 +113,20 @@ export default function HomePage() {
       </section>
 
 
+
+      <section className="card">
+        <p className="text-xs uppercase tracking-[0.24em] text-accent">New demo</p>
+        <h2 className="mt-3 text-2xl font-semibold">Winamp-style MP3 player</h2>
+        <p className="mt-3 max-w-3xl text-sm text-ink">
+          Try our easy visual MP3 player with upload support, playlist handling, and live-generated artwork while the music runs.
+        </p>
+        <div className="mt-6">
+          <Link href="/winamp" className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-night hover:opacity-90">
+            Open MP3 Player
+          </Link>
+        </div>
+      </section>
+
       <section className="card">
         <h2 className="text-2xl font-semibold">Case studies kommer snart</h2>
         <p className="mt-3 max-w-3xl text-sm text-ink">
