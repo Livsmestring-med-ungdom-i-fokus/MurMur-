@@ -36,7 +36,7 @@ export default function MurmurAiCoreLandingPage() {
       </section>
 
       <SectionShell title="VIP" eyebrow="Not for everyone">
-        <p className="text-base text-cyan-100">MurmurAi.proton.me</p>
+        <p className="text-base text-cyan-100">MurmurAi@proton.me</p>
         <p className="mt-2 text-lg">VIP 🍒</p>
       </SectionShell>
 

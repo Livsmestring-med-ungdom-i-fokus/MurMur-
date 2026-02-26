@@ -15,6 +15,12 @@ export default function MurmurAiCoreLayout({ children }: { children: ReactNode }
         <p className="mt-3 max-w-3xl text-sm text-slate-200">
           Production-grade SaaS architecture focused on progression, membership intelligence, certification pathways, and long-term learning retention.
         </p>
+        <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-cyan-300/40 bg-cyan-900/20 px-4 py-1.5 text-xs text-cyan-100">
+          <span className="uppercase tracking-[0.12em] text-cyan-300">Kontakt</span>
+          <a href="mailto:MurmurAi@proton.me" className="glow-button font-medium text-cyan-100 hover:text-white">
+            MurmurAi@proton.me
+          </a>
+        </div>
       </header>
       <div className="relative z-10">
         <MurmurCoreNav />
