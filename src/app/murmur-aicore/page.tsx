@@ -15,10 +15,10 @@ export default function MurmurAiCoreLandingPage() {
             MurMurAiCore transforms learning into structured progression with measurable outcomes, intelligent pacing, and membership-powered growth.
           </p>
           <div className="mt-6 flex gap-3">
-            <Link href="/murmur-aicore/auth" className="rounded-full bg-cyan-300 px-5 py-2 text-sm font-semibold text-slate-900">
+            <Link href="/murmur-aicore/auth" className="glow-button rounded-full bg-cyan-300 px-5 py-2 text-sm font-semibold text-slate-900">
               Start Membership
             </Link>
-            <Link href="/murmur-aicore/pricing" className="rounded-full border border-white/20 px-5 py-2 text-sm text-white">
+            <Link href="/murmur-aicore/pricing" className="glow-button rounded-full border border-white/20 px-5 py-2 text-sm text-white">
               Compare Tiers
             </Link>
           </div>
@@ -34,6 +34,11 @@ export default function MurmurAiCoreLandingPage() {
           </ul>
         </div>
       </section>
+
+      <SectionShell title="VIP" eyebrow="Not for everyone">
+        <p className="text-base text-cyan-100">MurmurAi.proton.me</p>
+        <p className="mt-2 text-lg">VIP 🍒</p>
+      </SectionShell>
 
       <div className="grid gap-6 md:grid-cols-2">
         <SectionShell title="System explanation" eyebrow="Core Product Concept">

@@ -15,7 +15,7 @@ export function MurmurCoreNav() {
       <ul className="flex flex-wrap gap-3 text-xs uppercase tracking-[0.14em] text-slate-200">
         {links.map((link) => (
           <li key={link.href}>
-            <Link href={link.href} className="rounded-full border border-white/10 px-3 py-1.5 hover:border-cyan-300/80 hover:text-cyan-200">
+            <Link href={link.href} className="glow-button rounded-full border border-white/10 px-3 py-1.5 hover:border-cyan-300/80 hover:text-cyan-200">
               {link.label}
             </Link>
           </li>
