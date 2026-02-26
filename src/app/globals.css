@@ -27,3 +27,55 @@ body {
 a {
   @apply transition-colors duration-200;
 }
+
+.glow-button {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.glow-button:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 16px rgba(34, 211, 238, 0.45),
+    0 0 30px rgba(34, 211, 238, 0.2);
+}
+
+.shooting-star {
+  position: absolute;
+  width: 180px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(34, 211, 238, 0), rgba(186, 230, 253, 0.95), rgba(34, 211, 238, 0));
+  filter: drop-shadow(0 0 8px rgba(186, 230, 253, 0.8));
+  border-radius: 999px;
+  opacity: 0;
+  animation: shootingStar 8s linear infinite;
+}
+
+.shooting-star-a {
+  top: 12%;
+  left: -12%;
+  animation-delay: 0s;
+}
+
+.shooting-star-b {
+  top: 28%;
+  left: -18%;
+  animation-delay: 4s;
+}
+
+@keyframes shootingStar {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(-14deg) scaleX(0.55);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  24% {
+    transform: translate3d(130vw, -30vh, 0) rotate(-14deg) scaleX(1);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(130vw, -30vh, 0) rotate(-14deg) scaleX(1);
+    opacity: 0;
+  }
+}
