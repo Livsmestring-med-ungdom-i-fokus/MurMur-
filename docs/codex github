@@ -1,0 +1,35 @@
+gh issue create \
+  --title "Codex Integration — Repository Connection & Execution Pipeline" \
+  --label "integration,infrastructure,ai-agent,high-priority" \
+  --body "
+We need to establish a working integration between Codex and this repository to enable autonomous development workflows.
+
+OBJECTIVES
+- Connect Codex to repository
+- Enable environment detection (env variables, runtime, dependencies)
+- Configure execution permissions and scope
+- Establish secure authentication
+- Validate read / write operations
+- Enable task-driven development flow
+
+REQUIRED COMPONENTS
+- Repository access configuration
+- Environment variable loading
+- Runtime compatibility check
+- Secure token / auth setup
+- Task execution interface
+- Logging and traceability layer
+
+ACCEPTANCE CRITERIA
+- Codex can read repository structure
+- Codex can generate and commit code via controlled workflow
+- Environment variables resolve correctly
+- Authentication verified and secure
+- Integration tested with simple task
+- Logs confirm successful execution
+
+INITIAL TEST TASK
+Create a minimal file in the repo via Codex and verify commit + trace log.
+
+This is a foundational step required for autonomous development capabilities.
+"
