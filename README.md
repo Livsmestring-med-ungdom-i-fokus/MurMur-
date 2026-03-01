@@ -22,19 +22,10 @@ Production-ready foundation for **murmurapp.no** with Next.js App Router, Stripe
 
 ## Environment Variables
 
-Create `.env.local`:
+Copy `.env.example` to `.env.local` and fill values:
 
 ```bash
-SUPABASE_URL=
-SUPABASE_SERVICE_ROLE_KEY=
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-STRIPE_PRICE_STARTER=
-STRIPE_PRICE_GROWTH=
-VIPPS_STARTPAKKE_PRICE_ID=
-BILLING_PORTAL_RETURN_URL=http://localhost:3000/dashboard
-CRON_SECRET=
-DEV_FALLBACK_USER_ID=
+cp .env.example .env.local
 ```
 
 > `DEV_FALLBACK_USER_ID` is only for local testing and should not be enabled in production.
@@ -82,6 +73,17 @@ npm run build
 2. Run SQL from `supabase/schema.sql` in SQL editor.
 3. Enable RLS policies appropriate for your org (service role is used only server-side for backend routes).
 4. Use Supabase Auth user ID as canonical customer identity (`customers.user_id`).
+
+
+## Vercel Configuration
+
+The repo now includes `vercel.json` with:
+
+- framework detection for Next.js
+- cron schedule (`*/30 * * * *`) for `/api/jobs/subscription-sync`
+- baseline security headers (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`)
+
+For cron auth, set `CRON_SECRET` in Vercel project environment variables. Vercel will send it as `Authorization: Bearer <CRON_SECRET>` to the job endpoint.
 
 ## Deployment (GitHub → Vercel → Domeneshop)
 

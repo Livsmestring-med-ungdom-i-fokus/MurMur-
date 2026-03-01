@@ -11,25 +11,58 @@ type StripeEvent = {
   };
 };
 
+const WEBHOOK_TOLERANCE_SECONDS = 300;
+
+function getObjectValue(object: Record<string, unknown>, key: string): unknown {
+  return object[key];
+}
+
+function getString(object: Record<string, unknown>, key: string): string | null {
+  const value = getObjectValue(object, key);
+  return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
+function getNestedString(object: Record<string, unknown>, path: string[]): string | null {
+  let cursor: unknown = object;
+  for (const key of path) {
+    if (!cursor || typeof cursor !== 'object') {
+      return null;
+    }
+    cursor = (cursor as Record<string, unknown>)[key];
+  }
+  return typeof cursor === 'string' && cursor.length > 0 ? cursor : null;
+}
+
 function verifyStripeSignature(payload: string, signatureHeader: string, secret: string): boolean {
   const pairs = signatureHeader.split(',').map((entry) => entry.trim());
   const timestamp = pairs.find((entry) => entry.startsWith('t='))?.slice(2);
-  const signature = pairs.find((entry) => entry.startsWith('v1='))?.slice(3);
+  const signatures = pairs.filter((entry) => entry.startsWith('v1=')).map((entry) => entry.slice(3));
 
-  if (!timestamp || !signature) {
+  if (!timestamp || signatures.length === 0) {
+    return false;
+  }
+
+  const timestampUnix = Number(timestamp);
+  if (!Number.isFinite(timestampUnix)) {
+    return false;
+  }
+
+  if (Math.abs(Date.now() / 1000 - timestampUnix) > WEBHOOK_TOLERANCE_SECONDS) {
     return false;
   }
 
   const signedPayload = `${timestamp}.${payload}`;
   const expected = createHmac('sha256', secret).update(signedPayload, 'utf8').digest('hex');
 
-  const expectedBuffer = Buffer.from(expected);
-  const receivedBuffer = Buffer.from(signature);
+  return signatures.some((signature) => {
+    const expectedBuffer = Buffer.from(expected, 'utf8');
+    const receivedBuffer = Buffer.from(signature, 'utf8');
 
-  return expectedBuffer.length === receivedBuffer.length && timingSafeEqual(expectedBuffer, receivedBuffer);
+    return expectedBuffer.length === receivedBuffer.length && timingSafeEqual(expectedBuffer, receivedBuffer);
+  });
 }
 
-function mapPriceToPlanCode(priceId: string | undefined): 'starter' | 'growth' | 'vipps_startpakke' {
+function mapPriceToPlanCode(priceId: string | null): 'starter' | 'growth' | 'vipps_startpakke' {
   if (priceId === process.env.STRIPE_PRICE_GROWTH) {
     return 'growth';
   }
@@ -40,12 +73,20 @@ function mapPriceToPlanCode(priceId: string | undefined): 'starter' | 'growth' |
 }
 
 async function handleCheckoutSession(event: StripeEvent) {
-  const object = event.data.object as Record<string, any>;
-  const email = String(object.customer_email ?? object.customer_details?.email ?? 'unknown@example.com');
-  const userId = String(object.client_reference_id ?? object.metadata?.supabase_user_id ?? 'anonymous');
-  const stripeCustomerId = typeof object.customer === 'string' ? object.customer : null;
-  const subscriptionId = typeof object.subscription === 'string' ? object.subscription : null;
-  const planCode = mapPriceToPlanCode(String(object.metadata?.plan_price_id ?? ''));
+  const object = event.data.object;
+  const userId = getString(object, 'client_reference_id') ?? getNestedString(object, ['metadata', 'supabase_user_id']);
+  const email = getString(object, 'customer_email') ?? getNestedString(object, ['customer_details', 'email']);
+
+  if (!userId || !email) {
+    await writeAuditLog('stripe.checkout.skipped_missing_identity', 'stripe_webhook', {
+      eventId: event.id,
+    });
+    return;
+  }
+
+  const stripeCustomerId = getString(object, 'customer');
+  const subscriptionId = getString(object, 'subscription');
+  const planPriceId = getNestedString(object, ['metadata', 'plan_price_id']);
 
   const customer = await upsertCustomer({ userId, email, stripeCustomerId });
 
@@ -54,7 +95,7 @@ async function handleCheckoutSession(event: StripeEvent) {
       customerId: customer.id,
       provider: 'stripe',
       providerSubscriptionId: subscriptionId,
-      planCode,
+      planCode: mapPriceToPlanCode(planPriceId),
       status: 'active',
     });
   }
@@ -67,17 +108,30 @@ async function handleCheckoutSession(event: StripeEvent) {
 }
 
 async function handleSubscriptionEvent(event: StripeEvent) {
-  const object = event.data.object as Record<string, any>;
-  const stripeCustomerId = String(object.customer ?? '');
-  const subscriptionId = String(object.id ?? '');
+  const object = event.data.object;
+  const stripeCustomerId = getString(object, 'customer');
+  const subscriptionId = getString(object, 'id');
 
   if (!stripeCustomerId || !subscriptionId) {
     return;
   }
 
-  const userId = String(object.metadata?.supabase_user_id ?? 'anonymous');
-  const email = String(object.metadata?.customer_email ?? 'unknown@example.com');
-  const priceId = String(object.items?.data?.[0]?.price?.id ?? '');
+  const userId = getNestedString(object, ['metadata', 'supabase_user_id']);
+  const email = getNestedString(object, ['metadata', 'customer_email']);
+
+  if (!userId || !email) {
+    await writeAuditLog('stripe.subscription.skipped_missing_identity', 'stripe_webhook', {
+      eventId: event.id,
+      subscriptionId,
+      stripeCustomerId,
+    });
+    return;
+  }
+
+  const priceId = getNestedString(object, ['items', 'data', '0', 'price', 'id']);
+  const currentPeriodEndUnix = Number(getObjectValue(object, 'current_period_end'));
+  const status = getString(object, 'status') ?? 'incomplete';
+  const cancelAtPeriodEnd = Boolean(getObjectValue(object, 'cancel_at_period_end'));
 
   const customer = await upsertCustomer({
     userId,
@@ -85,16 +139,16 @@ async function handleSubscriptionEvent(event: StripeEvent) {
     stripeCustomerId,
   });
 
-  const currentPeriodEndUnix = Number(object.current_period_end ?? 0);
-
   await upsertSubscription({
     customerId: customer.id,
     provider: 'stripe',
     providerSubscriptionId: subscriptionId,
     planCode: mapPriceToPlanCode(priceId),
-    status: String(object.status ?? 'incomplete'),
-    currentPeriodEnd: currentPeriodEndUnix ? new Date(currentPeriodEndUnix * 1000).toISOString() : null,
-    cancelAtPeriodEnd: Boolean(object.cancel_at_period_end),
+    status,
+    currentPeriodEnd: Number.isFinite(currentPeriodEndUnix) && currentPeriodEndUnix > 0
+      ? new Date(currentPeriodEndUnix * 1000).toISOString()
+      : null,
+    cancelAtPeriodEnd,
   });
 
   await writeAuditLog('stripe.subscription.updated', 'stripe_webhook', {
