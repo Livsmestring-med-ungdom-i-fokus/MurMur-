@@ -1,0 +1,74 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: murmur
+      POSTGRES_PASSWORD: murmur
+      POSTGRES_DB: murmur
+    volumes:
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U murmur"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  core:
+    build: ./murmur-core
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      REDIS_URL: ${REDIS_URL}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      SERVICE_NAME: ${SERVICE_NAME:-murmur-api}
+      QUEUE_NAME: ${QUEUE_NAME:-tasks}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  billing:
+    build: ./murmur-billing
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      STRIPE_KEY: ${STRIPE_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      REDIS_HOST: ${REDIS_HOST}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+
+  worker:
+    build: ./murmur-core
+    command: ["python", "-m", "worker"]
+    environment:
+      REDIS_URL: ${REDIS_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      SERVICE_NAME: ${SERVICE_NAME:-murmur-api}
+      WORKER_SERVICE_NAME: ${WORKER_SERVICE_NAME:-murmur-worker}
+      QUEUE_NAME: ${QUEUE_NAME:-tasks}
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  web:
+    build: ./murmur-web
+    ports:
+      - "3000:3000"

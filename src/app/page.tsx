@@ -18,6 +18,14 @@ const plans = [
   },
 ];
 
+const murmurWorldLocations = [
+  'Aurora Gallery',
+  'Nova Gallery',
+  'Echo Gallery',
+  'Marketplace Plaza',
+  'AI Museum',
+];
+
 export default function HomePage() {
   return (
     <div className="mx-auto max-w-5xl space-y-16 px-4 py-14">
