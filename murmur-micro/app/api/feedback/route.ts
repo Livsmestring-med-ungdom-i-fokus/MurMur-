@@ -40,7 +40,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown server error";
-    const status = /json/i.test(message) ? 400 : 500;
+    // Check if this is a client error (malformed JSON request) or server error
+    const status = error instanceof SyntaxError ? 400 : 500;
     return NextResponse.json({ error: message }, { status });
   }
 }
